@@ -56,7 +56,7 @@ ROOT_URLCONF = 'tiantian.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'tiantian.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.msyql',
+        'ENGINE': 'django.db.backends.mysql',
         'HOST': '127.0.0.1',
         'PORT': '3306',
         'USER': 'root',
@@ -105,3 +105,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS =[
+    os.path.join(BASE_DIR, 'static')
+]
