@@ -4,7 +4,6 @@ from . import models
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from hashlib import sha1
 
-
 # 注册页面
 def register(request):
     return render(request, 'tt_user/register.html', {'title': '注册'})
@@ -55,12 +54,12 @@ def login_handle(request):
     username = post.get('username')
     userpwd = post.get('pwd')
     jizhu = post.get('jizhu', 0)
-    # 密码加密
-    s1 = sha1()
-    s1.update(userpwd.encode('utf-8'))
-    userpwd1 = s1.hexdigest()
     user = models.UserInfo.objects.filter(uname=username)
     if len(user) == 1:
+        # 密码加密
+        s1 = sha1()
+        s1.update(userpwd.encode('utf-8'))
+        userpwd1 = s1.hexdigest()
         if user[0].upwd == userpwd1:
             # 用户名密码都正确,跳转到用户中心
             red = HttpResponseRedirect('/user/info')
@@ -82,16 +81,53 @@ def login_handle(request):
         return render(request, 'tt_user/login.html', context)
 
 
-# 个人信息
+# 用户中心－个人信息
 def info(request):
-    return render(request, 'tt_user/user_center_info.html')
+    user_id = request.session['user_id']
+    user_email = models.UserInfo.objects.get(pk=user_id).uemail
+    context = {
+        'title': '用户中心',
+        'user_email': user_email,
+        'user_name': request.session['username']
+    }
+    return render(request, 'tt_user/user_center_info.html', context)
 
 
-# 订单
+# 用户中心－全部订单
 def order(request):
-    return render(request, 'tt_user/user_center_order.html')
+    user_id = request.session['user_id']
+    user_email = models.UserInfo.objects.get(pk=user_id).uemail
+    context = {
+        'title': '用户中心',
+        'user_email': user_email,
+        'user_name': request.session['username'],
+
+    }
+    return render(request, 'tt_user/user_center_order.html', context)
 
 
-# 收货地址
+# 用户中心－收货地址
 def site(request):
-    return render(request, 'tt_user/user_center_site.html')
+    user = models.UserInfo.objects.get(pk=request.session['user_id'])
+    user_id = request.session['user_id']
+    user_email = models.UserInfo.objects.get(pk=user_id).uemail
+    context = {
+        'title': '用户中心',
+        'user_email': user_email,
+        'user_name': request.session['username'],
+        'user': user
+    }
+    return render(request, 'tt_user/user_center_site.html', context)
+
+
+def site_handle(request):
+    user = models.UserInfo.objects.get(pk=request.session['user_id'])
+    if request.method=='POST':
+        post = request.POST
+        user.ushou = post.get('ushou')
+        user.uaddr = post.get('uaddr')
+        user.upostcode = post.get('upostcode')
+        user.uphone = post.get('uphone')
+        user.save()
+    context = {'title': '用户中心', 'user': user}
+    return render(request, 'tt_user/user_center_site.html', context)
