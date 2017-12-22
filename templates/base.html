@@ -1,26 +1,36 @@
 {% extends 'base_foot.html'%}
-{%block head%}
-<script>
-    $(function(){
-        $('.login_btn').hide();
-        $('.login_info em').html('{{user_name}}');
-        $('.login_info').show();
-    })
-</script>
-{%endblock head%}
+
 {%block body%}
 	<div class="header_con">
 		<div class="header">
 			<div class="welcome fl">欢迎来到天天生鲜!</div>
 			<div class="fr">
-				<div class="login_info fl" id="login_info">
-					欢迎您：<em>张 山</em>
-				</div>
-				<div class="login_btn fl">
-					<a href="login.html">登录</a>
-					<span>|</span>
-					<a href="register.html">注册</a>
-				</div>
+				<!--{% if request.session.username|default:'' != '' %}-->
+				<!--<div class="login_info fl">-->
+					<!--欢迎您：<a>{{request.session.username}}</a>-->
+					<!--<span>|</span>-->
+					<!--<a href="/user/logout/">退出</a>-->
+				<!--</div>-->
+				<!--{% else %}-->
+				<!--<div class="login_btn fl">-->
+					<!--<a href="/user/login/">登录</a>-->
+					<!--<span>|</span>-->
+					<!--<a href="/user/register/">注册</a>-->
+				<!--</div>-->
+				<!--{% endif %}-->
+				{% if request.session.username|default:'' != '' %}
+             	<div class="user_link fl">
+                	<a href="/user/info">欢迎您：{{request.session.username}}</a>
+                	<span>|</span>
+                 	<a href="/user/logout/">退出</a>
+            	</div>
+            	{% else %}
+            	<div class="login_btn fl">
+                	<a href="/user/login/">登录</a>
+                	<span>|</span>
+                	<a href="/user/register">注册</a>
+            	</div>
+            	{% endif %}
 				<div class="user_link fl">
 					<span>|</span>
                     <!--TODO 硬编码-->
