@@ -1,8 +1,9 @@
 # coding=utf-8
 from django.shortcuts import render, redirect
-from . import models
+from tt_user.models import *
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from hashlib import sha1
+
 
 # 注册页面
 def register(request):
@@ -26,7 +27,7 @@ def register_handle(request):
     pwd = s1.hexdigest()
 
     # 创建对象
-    user = models.UserInfo()
+    user = UserInfo()
     user.uname = uname
     user.upwd = pwd
     user.uemail = uemail
@@ -37,7 +38,7 @@ def register_handle(request):
 # 判断用户名是否已经存在
 def register_exists(request):
     username = request.GET.get('uname')
-    count = models.UserInfo.objects.filter(uname=username).count()
+    count = UserInfo.objects.filter(uname=username).count()
     return JsonResponse({'count': count})
 
 
@@ -54,7 +55,7 @@ def login_handle(request):
     username = post.get('username')
     userpwd = post.get('pwd')
     jizhu = post.get('jizhu', 0)
-    user = models.UserInfo.objects.filter(uname=username)
+    user = UserInfo.objects.filter(uname=username)
     if len(user) == 1:
         # 密码加密
         s1 = sha1()
@@ -84,11 +85,11 @@ def login_handle(request):
 # 用户中心－个人信息
 def info(request):
     user_id = request.session['user_id']
-    user_email = models.UserInfo.objects.get(pk=user_id).uemail
+    user = UserInfo.objects.get(pk=request.session['user_id'])
     context = {
         'title': '用户中心',
-        'user_email': user_email,
-        'user_name': request.session['username']
+        'user_name': request.session['username'],
+        'user': user
     }
     return render(request, 'tt_user/user_center_info.html', context)
 
@@ -96,7 +97,7 @@ def info(request):
 # 用户中心－全部订单
 def order(request):
     user_id = request.session['user_id']
-    user_email = models.UserInfo.objects.get(pk=user_id).uemail
+    user_email = UserInfo.objects.get(pk=user_id).uemail
     context = {
         'title': '用户中心',
         'user_email': user_email,
@@ -108,9 +109,9 @@ def order(request):
 
 # 用户中心－收货地址
 def site(request):
-    user = models.UserInfo.objects.get(pk=request.session['user_id'])
+    user = UserInfo.objects.get(pk=request.session['user_id'])
     user_id = request.session['user_id']
-    user_email = models.UserInfo.objects.get(pk=user_id).uemail
+    user_email = UserInfo.objects.get(pk=user_id).uemail
     context = {
         'title': '用户中心',
         'user_email': user_email,
@@ -121,7 +122,7 @@ def site(request):
 
 
 def site_handle(request):
-    user = models.UserInfo.objects.get(pk=request.session['user_id'])
+    user = UserInfo.objects.get(pk=request.session['user_id'])
     if request.method=='POST':
         post = request.POST
         user.ushou = post.get('ushou')

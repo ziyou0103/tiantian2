@@ -1,0 +1,160 @@
+{%extends 'tt_goods/goods_base.html'%}
+{%block content%}
+	<div class="navbar_con">
+		<div class="navbar clearfix">
+			<div class="subnav_con fl">
+				<h1>全部商品分类</h1>	
+				<span></span>			
+				<ul class="subnav">
+					<li><a href="/list{{type0.id}}_1_1/" class="fruit">{{type0.gtype}}</a></li>
+					<li><a href="/list{{type1.id}}_1_1/" class="seafood">{{type1.gtype}}</a></li>
+					<li><a href="/list{{type2.id}}_1_1/" class="meet">{{type2.gtype}}</a></li>
+					<li><a href="/list{{type3.id}}_1_1/" class="egg">{{type3.gtype}}</a></li>
+					<li><a href="/list{{type4.id}}_1_1/" class="vegetables">{{type4.gtype}}</a></li>
+					<li><a href="/list{{type5.id}}_1_1/" class="ice">{{type5.gtype}}</a></li>
+				</ul>
+			</div>
+			<ul class="navlist fl">
+				<li><a href="/">首页</a></li>
+				<li class="interval">|</li>
+				<li><a href="">手机生鲜</a></li>
+				<li class="interval">|</li>
+				<li><a href="">抽奖</a></li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="breadcrumb">
+		<a href="/">全部分类</a>
+		<span>></span>
+		<a href="/list{{type_goods.id}}_1_1">{{goods.gtype}}</a>
+		<span>></span>
+		<a href="#">商品详情</a>
+	</div>
+
+	<div class="goods_detail_con clearfix">
+		<div class="goods_detail_pic fl"><img src="/{{goods.gpic}}"></div>
+
+		<div class="goods_detail_list fr">
+			<h3>{{goods.gname}}</h3>
+			<p>{{goods.gjianjie}}</p>
+			<div class="prize_bar">
+				<span class="show_pirze">¥<em>{{goods.gprice}}</em></span>
+				<span class="show_unit">单  位：{{goods.gunit}}</span>
+			</div>
+			<div class="goods_num clearfix">
+				<div class="num_name fl">数 量：</div>
+				<div class="num_add fl">
+					<input type="text" class="num_show fl" value="1">
+					<a href="javascript:;" class="add fr">+</a>
+					<a href="javascript:;" class="minus fr">-</a>	
+				</div> 
+			</div>
+			<div class="total">总价：<em>{{goods.gprice}}元</em></div>
+			<div class="operate_btn">
+				<a href="javascript:;" class="buy_btn">立即购买</a>
+				<a href="javascript:;" class="add_cart" id="add_cart">加入购物车</a>				
+			</div>
+		</div>
+	</div>
+
+	<div class="main_wrap clearfix">
+		<div class="l_wrap fl clearfix">
+			<div class="new_goods">
+				<h3>新品推荐</h3>
+				<ul>
+					{%for temp in new_goods %}
+					<li>
+						<a href="/{{temp.id}}"><img src="/{{temp.gpic}}"></a>
+						<h4><a href="/{{temp.id}}">{{temp.gname}}</a></h4>
+						<div class="prize">￥{{temp.gprice}}</div>
+					</li>
+					{%endfor %}
+				</ul>
+			</div>
+		</div>
+
+		<div class="r_wrap fr clearfix">
+			<ul class="detail_tab clearfix">
+				<li class="active">商品介绍</li>
+				<li>评论</li>
+			</ul>
+
+			<div class="tab_content">
+				<dl>
+					<!--TODO 此处有问题, 我使用的是HTMLField-->
+					<dt>商品详情：</dt>
+					{{goods.gcontent}}
+				</dl>
+			</div>
+
+		</div>
+	</div>
+{%endblock content%}
+{%block foot%}
+
+	<div class="add_jump"></div>
+
+	<script type="text/javascript" src="/static/js/jquery-1.12.2.js"></script>
+	<script type="text/javascript">
+		var $add_x = $('#add_cart').offset().top;
+		var $add_y = $('#add_cart').offset().left;
+
+		var $to_x = $('#show_count').offset().top;
+		var $to_y = $('#show_count').offset().left;
+
+		$(".add_jump").css({'left':$add_y+80,'top':$add_x+10,'display':'block'})
+		$('#add_cart').click(function(){
+			$(".add_jump").stop().animate({
+				'left': $to_y+7,
+				'top': $to_x+7},
+				"fast", function() {
+					$(".add_jump").fadeOut('fast',function(){
+						$('#show_count').html(2);
+					});
+
+			});
+		})
+	</script>
+	<script>
+		$(function(){
+			<!--点击＋时-->
+   			$('.add').click(function(){
+   				<!--获取当前数量-->
+  				num = parseInt($('.num_show').val());
+  				<!--数量小于库存-->
+  				if(num<{{goods.gkucun}}){
+     				$('.num_show').val(num+1);
+     				<!--修改总价 toFixed(2)：将总价保留两位小数-->
+     				zongjia = ((num+1)*{{goods.gprice}}).toFixed(2);
+     			}
+				$('.total em').html(zongjia+'元');
+     		})
+
+			<!--点击－时-->
+			$('.minus').click(function(){
+				num = parseInt($('.num_show').val());
+				<!--数量大于０-->
+				if(num>0){
+					$('.num_show').val(num-1);
+					zongjia = ((num-1)*{{goods.gprice}}).toFixed(2);
+				}
+				$('.total em').html(zongjia+'元');
+			})
+
+			<!--手动输入数量时-->
+			$('.num_show').change(function(){
+				num = parseInt($(this).val());
+				if(num<={{goods.gkucun}} && num>=0){
+					zongjia = (num*{{goods.gprice}}).toFixed(2);
+				}else if(num<0){
+					$(this).val(1);
+				}else{
+					box = confirm("不好意思,库存不足, 请重新输入！当前库存数量为{{goods.gkucun}}");
+					$(this).val(1);
+				}
+				$('.total em').html(zongjia+'元');
+			})
+   		})
+	</script>
+{%endblock foot%}
