@@ -5,19 +5,6 @@
 		<div class="header">
 			<div class="welcome fl">欢迎来到天天生鲜!</div>
 			<div class="fr">
-				<!--{% if request.session.username|default:'' != '' %}-->
-				<!--<div class="login_info fl">-->
-					<!--欢迎您：<a>{{request.session.username}}</a>-->
-					<!--<span>|</span>-->
-					<!--<a href="/user/logout/">退出</a>-->
-				<!--</div>-->
-				<!--{% else %}-->
-				<!--<div class="login_btn fl">-->
-					<!--<a href="/user/login/">登录</a>-->
-					<!--<span>|</span>-->
-					<!--<a href="/user/register/">注册</a>-->
-				<!--</div>-->
-				<!--{% endif %}-->
 				{% if request.session.username|default:'' != '' %}
              	<div class="user_link fl">
                 	<a href="/user/info">欢迎您：{{request.session.username}}</a>
@@ -43,7 +30,7 @@
 			</div>
 		</div>
 	</div>
-
+	{%if page_num = 1%}
 	<div class="search_bar clearfix">
 		<a href="/" class="logo fl"><img src="/static/images/logo.png"></a>
 		<div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;用户中心</div>
@@ -52,5 +39,19 @@
 			<input type="button" class="input_btn fr" name="" value="搜索">
 		</div>
 	</div>
-        {%block body2%}{%endblock body2%}
+	{% endif%}
+	{%if page_num = 2%}
+	<div class="search_bar clearfix">
+		<a href="/" class="logo fl"><img src="/static/images/logo.png"></a>
+		<div class="search_con fl">
+			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
+			<input type="button" class="input_btn fr" name="" value="搜索">
+		</div>
+		<div class="guest_cart fr">
+			<a href="cart.html" class="cart_name fl">我的购物车</a>
+			<div class="goods_count fl" id="show_count">1</div>
+		</div>
+	</div>
+	{%endif%}
+        {%block content%}{%endblock content%}
         {%endblock body%}

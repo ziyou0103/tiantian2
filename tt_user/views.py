@@ -3,7 +3,8 @@ from django.shortcuts import render, redirect
 from tt_user.models import *
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from hashlib import sha1
-
+from . import user_decorator
+from tt_goods.models import GoodsInfo
 
 # 注册页面
 def register(request):
@@ -45,7 +46,13 @@ def register_exists(request):
 # 登录
 def login(request):
     username = request.COOKIES.get('username', '')
-    return render(request, 'tt_user/login.html', {'title': '登录', 'username':username})
+    return render(request, 'tt_user/login.html', {'title': '登录', 'username': username})
+
+
+# 退出
+def logout(request):
+    request.session.flush()
+    return redirect('/')
 
 
 # 登录处理
@@ -62,8 +69,9 @@ def login_handle(request):
         s1.update(userpwd.encode('utf-8'))
         userpwd1 = s1.hexdigest()
         if user[0].upwd == userpwd1:
-            # 用户名密码都正确,跳转到用户中心
-            red = HttpResponseRedirect('/user/info')
+            # 用户名密码都正确,
+            url = request.COOKIES.get('url', '/')
+            red = HttpResponseRedirect(url)
             # 如勾选了记住用户名,设置cookie和session信息
             if jizhu != 0:
                 red.set_cookie('username', username)
@@ -83,23 +91,32 @@ def login_handle(request):
 
 
 # 用户中心－个人信息
+@user_decorator.login
 def info(request):
     user_id = request.session['user_id']
     user = UserInfo.objects.get(pk=request.session['user_id'])
+
+    new_goodsids = request.COOKIES.get('new_goodsids', '')
+    new_goodsids1 = new_goodsids.split(',')
+    new_goodslist = []
+    if len(new_goodsids) != 0:
+        for new_goodsid in new_goodsids1:
+            new_goodslist.append(GoodsInfo.objects.get(pk=int(new_goodsid)))
     context = {
-        'title': '用户中心',
+        'title': '用户中心', 'page_num': 1,
         'user_name': request.session['username'],
-        'user': user
+        'user': user, 'new_goodslist': new_goodslist,
     }
     return render(request, 'tt_user/user_center_info.html', context)
 
 
 # 用户中心－全部订单
+@user_decorator.login
 def order(request):
     user_id = request.session['user_id']
     user_email = UserInfo.objects.get(pk=user_id).uemail
     context = {
-        'title': '用户中心',
+        'title': '用户中心', 'page_num': 1,
         'user_email': user_email,
         'user_name': request.session['username'],
 
@@ -108,19 +125,20 @@ def order(request):
 
 
 # 用户中心－收货地址
+@user_decorator.login
 def site(request):
     user = UserInfo.objects.get(pk=request.session['user_id'])
     user_id = request.session['user_id']
     user_email = UserInfo.objects.get(pk=user_id).uemail
     context = {
-        'title': '用户中心',
+        'title': '用户中心', 'page_num': 1,
         'user_email': user_email,
         'user_name': request.session['username'],
         'user': user
     }
     return render(request, 'tt_user/user_center_site.html', context)
 
-
+@user_decorator.login
 def site_handle(request):
     user = UserInfo.objects.get(pk=request.session['user_id'])
     if request.method=='POST':
@@ -130,5 +148,5 @@ def site_handle(request):
         user.upostcode = post.get('upostcode')
         user.uphone = post.get('uphone')
         user.save()
-    context = {'title': '用户中心', 'user': user}
+    context = {'title': '用户中心', 'user': user, 'page_num': 1}
     return render(request, 'tt_user/user_center_site.html', context)

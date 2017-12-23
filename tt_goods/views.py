@@ -6,19 +6,19 @@ from django.core.paginator import Paginator
 def index(request):
     type_list = TypeGoods.objects.all()
     type0 = type_list[0].goodsinfo_set.order_by('-id')[0:4]
-    type01 = type_list[0].goodsinfo_set.order_by('-gclick')[0:3]
+    type01 = type_list[0].goodsinfo_set.order_by('-gclick')[0:4]
     type1 = type_list[1].goodsinfo_set.order_by('-id')[0:4]
-    type11 = type_list[1].goodsinfo_set.order_by('-gclick')[0:3]
+    type11 = type_list[1].goodsinfo_set.order_by('-gclick')[0:4]
     type2 = type_list[2].goodsinfo_set.order_by('-id')[0:4]
-    type21 = type_list[2].goodsinfo_set.order_by('-gclick')[0:3]
+    type21 = type_list[2].goodsinfo_set.order_by('-gclick')[0:4]
     type3 = type_list[3].goodsinfo_set.order_by('-id')[0:4]
-    type31 = type_list[3].goodsinfo_set.order_by('-gclick')[0:3]
+    type31 = type_list[3].goodsinfo_set.order_by('-gclick')[0:4]
     type4 = type_list[4].goodsinfo_set.order_by('-id')[0:4]
-    type41 = type_list[4].goodsinfo_set.order_by('-gclick')[0:3]
+    type41 = type_list[4].goodsinfo_set.order_by('-gclick')[0:4]
     type5= type_list[5].goodsinfo_set.order_by('-id')[0:4]
-    type51 = type_list[5].goodsinfo_set.order_by('-gclick')[0:3]
+    type51 = type_list[5].goodsinfo_set.order_by('-gclick')[0:4]
     context = {
-        'title': '首页',
+        'title': '首页', 'page_num': 2,
         'type0': type0, 'type01': type01, 'good1': type_list[0],
         'type1': type1, 'type11': type11, 'good2': type_list[1],
         'type2': type2, 'type21': type21, 'good3': type_list[2],
@@ -57,7 +57,7 @@ def list(request, typeid, sortid, pageid):
     page = paginator.page(int(pageid))
     context = {
         'title': '商品列表', 'typeid': typeid, 'type_goods': type_goods,
-        'new_goods': new_goods, 'page': page,
+        'new_goods': new_goods, 'page': page, 'page_num': 2,
         'paginator': paginator, 'sortid': sortid,
         'type0': type0, 'type1': type1, 'type2': type2,
         'type3': type3, 'type4': type4, 'type5': type5,
@@ -84,6 +84,24 @@ def detail(request, id):
     context = {
         'title': '商品列表', 'goods': goods, 'new_goods': new_goods, 'type_goods': type_goods,
         'type0': type0, 'type1': type1, 'type2': type2,
-        'type3': type3, 'type4': type4, 'type5': type5,
+        'type3': type3, 'type4': type4, 'type5': type5, 'page_num': 2,
     }
-    return render(request, 'tt_goods/detail.html', context)
+    response = render(request, 'tt_goods/detail.html', context)
+    # 记录最近浏览，　在用户中心要陈列５条最近浏览的商品
+    # 获取当前cookie信息
+    new_goodsids = request.COOKIES.get('new_goodsids', '')
+    goods_id = '%d' %goods.id
+    if new_goodsids != '':
+        # 拆分cookies列表
+        new_goodsid1 = new_goodsids.split(',')
+        if new_goodsid1.count(goods_id)>=1:# 列表中存在当前商品id
+            new_goodsid1.remove(goods_id)
+        new_goodsid1.insert(0, goods_id)
+        if len(new_goodsid1) >= 6:
+            del new_goodsid1[5]
+        new_goodsids=','.join(new_goodsid1)
+    else:
+        new_goodsids = goods_id
+    # 写入cookie
+    response.set_cookie('new_goodsids', new_goodsids)
+    return response
