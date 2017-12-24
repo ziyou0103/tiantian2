@@ -122,12 +122,9 @@
    			$('.add').click(function(){
    				<!--获取当前数量-->
   				num = parseInt($('.num_show').val());
-  				<!--数量小于库存-->
-  				if(num<{{goods.gkucun}}){
-     				$('.num_show').val(num+1);
-     				<!--修改总价 toFixed(2)：将总价保留两位小数-->
-     				zongjia = ((num+1)*{{goods.gprice}}).toFixed(2);
-     			}
+     			$('.num_show').val(num+1);
+     			<!--修改总价 toFixed(2)：将总价保留两位小数-->
+     			zongjia = ((num+1)*{{goods.gprice}}).toFixed(2);
 				$('.total em').html(zongjia+'元');
      		})
 
@@ -135,7 +132,7 @@
 			$('.minus').click(function(){
 				num = parseInt($('.num_show').val());
 				<!--数量大于０-->
-				if(num>0){
+				if(num>1){
 					$('.num_show').val(num-1);
 					zongjia = ((num-1)*{{goods.gprice}}).toFixed(2);
 				}
@@ -145,13 +142,11 @@
 			<!--手动输入数量时-->
 			$('.num_show').change(function(){
 				num = parseInt($(this).val());
-				if(num<={{goods.gkucun}} && num>=0){
+				if(num>=1){
 					zongjia = (num*{{goods.gprice}}).toFixed(2);
-				}else if(num<0){
-					$(this).val(1);
 				}else{
-					box = confirm("不好意思,库存不足, 请重新输入！当前库存数量为{{goods.gkucun}}");
 					$(this).val(1);
+					zongjia = ({{goods.gprice}}).toFixed(2);
 				}
 				$('.total em').html(zongjia+'元');
 			})

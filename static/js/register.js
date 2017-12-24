@@ -8,6 +8,18 @@ $(function(){
 
 	$('#user_name').blur(function() {
 		check_user_name();
+          // 判断用户名是否存在
+            $.get('/user/register_exists/?uname='+$('#user_name').val(), function(data){
+                if(data.count==1){
+                    $('#user_name').next().html('用户名已经存在').show()
+                    error_name = true;
+                }else{
+                    $('#user_name').next().hide();
+                    error_name = false;
+
+                }
+            });
+
 	});
 
 	$('#pwd').blur(function() {
@@ -47,17 +59,19 @@ $(function(){
 		}
 		else
 		{
-            // 判断用户名是否存在
-            $.get('/user/register_exists/?uname='+$('#user_name').val(), function(data){
-                if(data.count==1){
-                    $('#user_name').next().html('用户名已经存在').show()
-                    error_name = true;
-                }else{
-                    $('#user_name').next().hide();
-                    error_name = false;
-
-                }
-            });
+		    $('#user_name').next().hide();
+                error_name = false;
+//            // 判断用户名是否存在
+//            $.get('/user/register_exists/?uname='+$('#user_name').val(), function(data){
+//                if(data.count==1){
+//                    $('#user_name').next().html('用户名已经存在').show()
+//                    error_name = true;
+//                }else{
+//                    $('#user_name').next().hide();
+//                    error_name = false;
+//
+//                }
+//            });
 		}
 	}
 

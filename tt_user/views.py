@@ -57,6 +57,8 @@ def logout(request):
 
 # 登录处理
 def login_handle(request):
+    # 设置当浏览器关闭时,session自动生效
+    request.session.set_expiry(0)
     # 获取用户输入
     post = request.POST
     username = post.get('username')
@@ -96,7 +98,7 @@ def info(request):
     user_id = request.session['user_id']
     user = UserInfo.objects.get(pk=request.session['user_id'])
 
-    new_goodsids = request.COOKIES.get('new_goodsids', '')
+    new_goodsids = request.COOKIES.get('mycookie_key', '')
     new_goodsids1 = new_goodsids.split(',')
     new_goodslist = []
     if len(new_goodsids) != 0:

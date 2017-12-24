@@ -89,7 +89,10 @@ def detail(request, id):
     response = render(request, 'tt_goods/detail.html', context)
     # 记录最近浏览，　在用户中心要陈列５条最近浏览的商品
     # 获取当前cookie信息
-    new_goodsids = request.COOKIES.get('new_goodsids', '')
+    # 设置当前登录用户最近浏览商品的cookie键，用来区分不同用户
+    user_id = request.session.get('user_id')
+    mycookie_key = str(user_id) + 'new_goodsids'
+    new_goodsids = request.COOKIES.get('mycookie_key', '')
     goods_id = '%d' %goods.id
     if new_goodsids != '':
         # 拆分cookies列表
@@ -103,5 +106,6 @@ def detail(request, id):
     else:
         new_goodsids = goods_id
     # 写入cookie
-    response.set_cookie('new_goodsids', new_goodsids)
+
+    response.set_cookie('mycookie_key', new_goodsids)
     return response
