@@ -1,6 +1,16 @@
 {% extends 'base_foot.html'%}
 
 {%block body%}
+	<script>
+		$(function(){
+			$('#logout').click(function(){
+				out = confirm("您确定要退出吗？");
+				if(out){
+					$(this).attr("href","/user/logout");
+				}
+			})
+		})
+	</script>
 	<div class="header_con">
 		<div class="header">
 			<div class="welcome fl">欢迎来到天天生鲜!</div>
@@ -9,13 +19,14 @@
              	<div class="user_link fl">
                 	<a href="/user/info">欢迎您：{{request.session.username}}</a>
                 	<span>|</span>
-                 	<a href="/user/logout/">退出</a>
+                 	<a href="#" id="logout">退出</a>
             	</div>
             	{% else %}
             	<div class="login_btn fl">
-                	<a href="/user/login/">登录</a>
+					<!-- TODO -->
+                	<a href="/user/login/?param=1">登录</a>
                 	<span>|</span>
-                	<a href="/user/register">注册</a>
+                	<a href="#">注册</a>
             	</div>
             	{% endif %}
 				<div class="user_link fl">

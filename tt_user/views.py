@@ -71,9 +71,19 @@ def login_handle(request):
         s1.update(userpwd.encode('utf-8'))
         userpwd1 = s1.hexdigest()
         if user[0].upwd == userpwd1:
-            # 用户名密码都正确,
+            # 用户名密码都正确
+            # 获取到用户进入登录界面的url
             url = request.COOKIES.get('url', '/')
-            red = HttpResponseRedirect(url)
+            # 判断url　是否携带了参数
+            if '?' in url:
+                canshu = url.split('?')[1]
+                if canshu != '':
+                    num = canshu.split('=')[1]
+                    # 如果参数登录１,说明用户是重新登录的，当用户登录成功后所在的页面应该是首页
+                    if num == 1:
+                        red = HttpResponseRedirect('/')
+            else:
+                red = HttpResponseRedirect(url)
             # 如勾选了记住用户名,设置cookie和session信息
             if jizhu != 0:
                 red.set_cookie('username', username)
