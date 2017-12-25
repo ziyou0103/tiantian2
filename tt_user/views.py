@@ -80,8 +80,8 @@ def login_handle(request):
                 if canshu != '':
                     num = canshu.split('=')[1]
                     # 如果参数登录１,说明用户是重新登录的，当用户登录成功后所在的页面应该是首页
-                    if num == 1:
-                        red = HttpResponseRedirect('/')
+                    if num == '1':
+                        red = redirect('/')
             else:
                 red = HttpResponseRedirect(url)
             # 如勾选了记住用户名,设置cookie和session信息

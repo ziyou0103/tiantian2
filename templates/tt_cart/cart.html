@@ -1,0 +1,140 @@
+{%extends 'base.html'%}
+	{%block content%}
+	<div class="total_count">全部商品<em>{{goods_count}}</em>件</div>
+	<ul class="cart_list_th clearfix">
+		<li class="col01">商品名称</li>
+		<li class="col02">商品单位</li>
+		<li class="col03">商品价格</li>
+		<li class="col04">数量</li>
+		<li class="col05">小计</li>
+		<li class="col06">操作</li>
+	</ul>
+	{%for cart in carts%}
+	<ul class="cart_list_td clearfix" id="{{cart.id}}">
+		<li class="col01"><input type="checkbox" name="" checked></li>
+		<li class="col02"><img src="/{{cart.goods.gpic}}"></li>
+		<li class="col03">{{cart.goods.gname}}<br><em>{{cart.goods.gprice}}元/{{cart.goods.gunit}}</em></li>
+		<li class="col04">{{cart.goods.gunit}}</li>
+		<li class="col05">{{cart.goods.gprice}}元</li>
+		<li class="col06">
+			<div class="num_add">
+				<a href="javascript:;" class="add fl">+</a>
+				<input type="text" class="num_show fl" value="{{cart.count}}">
+				<a href="javascript:;" class="minus fl">-</a>	
+			</div>
+		</li>
+		<li class="col07">25.80元</li>
+		<li class="col08"><a href="javascript:del_cart({{cart.id}});">删除</a></li>
+	</ul>
+{%endfor%}
+
+	<ul class="settlements">
+		<li class="col01"><input type="checkbox" name="" checked="" id="check_all"></li>
+		<li class="col02">全选</li>
+		<li class="col03">合计(不含运费)：<span>¥</span><em id="total">42.60</em><br>共计<b id="checked_goods">{{goods_count}}</b>件商品</li>
+		<li class="col04"><a href="place_order.html">去结算</a></li>
+	</ul>
+{%endblock content%}
+{%block foot%}
+<script>
+	<!--删除商品-->
+	function del_cart(cart_id){
+		del = confirm('您确定要删除该商品吗？');
+		if(del){
+			url = '/cart/delete'+cart_id+'/';
+			$.get(url, function(data){
+				if(data.ok==1){
+					$('ul').remove('#'+cart_id);
+					total();
+				}
+			});
+		}
+	}
+	<!--计算小计和总计的数值-->
+	function total(){
+		var total0 = 0; //　小计
+		var total = 0;　// 总价
+		checked_goods = 0 //　记录有被勾选商品数
+		$('.col07').each(function(){
+			<!--获取商品数量-->
+			num = $(this).prev().find('.num_show').val();
+			<!--获取商品价格-->
+			price = $(this).prev().prev().html();
+			<!--小计-->
+			total0 = (parseInt(num)*parseFloat(price)).toFixed(2);
+			$(this).html(total0);
+			<!--获取当前商品是否被勾选-->
+			state = $(this).parent().children('.col01').children().prop('checked');
+			if(state){// 勾选
+				checked_goods += 1;
+				total+=parseFloat(total0);
+			}
+		})
+		$('#checked_goods').text(checked_goods);
+		$('#total').text(total.toFixed(2));
+	}
+
+	$(function(){
+		total();
+
+		<!--全选、全消-->
+		$('#check_all').click(function(){
+			<!--获取全选框当前的状态-->
+			state = $(this).prop('checked');
+			$(':checkbox:not(#check_all)').prop('checked', state);
+			total();
+		})
+
+		<!--选择-->
+		<!--给除了全选框之外的所有选择框添加点击事件-->
+		$(':checkbox:not(#check_all)').click(function(){
+			total();
+			<!--如果当前点击的选择框勾选上了-->
+			if($(this).prop('checked')){
+				<!--如果当前选中的选择框＋１刚好等于所有选择框的个数-->
+				if($(':checked').length+1==$(':checkbox').length){
+					<!--让全选框勾选上-->
+					$('#check_all').prop('checked', true);
+				}
+			}else{
+				<!--让全选框不勾选-->
+				$('#check_all').prop('checked', false);
+			}
+		})
+
+		<!--点击＋-->
+		$('.add').click(function(){
+			txt = $(this).next();
+			txt.val(parseInt(txt.val())+1).blur();
+		})
+
+		<!--点击＋-->
+		$('.minus').click(function(){
+			txt = $(this).prev();
+			txt.val(parseInt(txt.val())-1).blur();
+		});
+
+		<!--手动输入数量-->
+		$('.num_show').blur(function(){
+			count = parseInt($(this).val())
+			<!--判断输入是否为正数-->
+			if(count <= 0 | isNaN(count)){
+				$(this).val(1);
+			}else{
+				$(this).val(count);
+			}
+			count = parseInt($(this).val())
+			cart_id = $(this).parents('.cart_list_td').attr('id');
+			url = '/cart/edit'+cart_id+'_'+count+'/';
+			$.get(url, function(data){
+				if(data.ok==1){
+					total();
+				}else{
+					$(this).val(data.count1);
+				}
+			});
+
+		});
+	})
+</script>
+{%endblock foot%}

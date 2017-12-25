@@ -16,8 +16,8 @@
 			<div class="welcome fl">欢迎来到天天生鲜!</div>
 			<div class="fr">
 				{% if request.session.username|default:'' != '' %}
-             	<div class="user_link fl">
-                	<a href="/user/info">欢迎您：{{request.session.username}}</a>
+             	<div class="login_btn fl">
+                	<a href="/">欢迎您：{{request.session.username}}</a>
                 	<span>|</span>
                  	<a href="#" id="logout">退出</a>
             	</div>
@@ -34,7 +34,7 @@
                     <!--TODO 硬编码-->
 					<a href="/user/info/">用户中心</a>
 					<span>|</span>
-					<a href="cart.html">我的购物车</a>
+					<a href="/cart/">我的购物车</a>
 					<span>|</span>
 					<a href="user_center_order.html">我的订单</a>
 				</div>
@@ -44,7 +44,7 @@
 	{%if page_num = 1%}
 	<div class="search_bar clearfix">
 		<a href="/" class="logo fl"><img src="/static/images/logo.png"></a>
-		<div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;用户中心</div>
+		<div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;{{title}}</div>
 		<div class="search_con fr">
 			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
 			<input type="button" class="input_btn fr" name="" value="搜索">
@@ -59,8 +59,8 @@
 			<input type="button" class="input_btn fr" name="" value="搜索">
 		</div>
 		<div class="guest_cart fr">
-			<a href="cart.html" class="cart_name fl">我的购物车</a>
-			<div class="goods_count fl" id="show_count">1</div>
+			<a href="/cart/" class="cart_name fl">我的购物车</a>
+			<div class="goods_count fl" id="show_count">{{cart_count}}</div>
 		</div>
 	</div>
 	{%endif%}

@@ -61,7 +61,7 @@
 					<div class="operate">
 						<span class="prize">￥{{goods.gprice}}</span>
 						<span class="unit">{{goods.gprice}}/{{goods.gunit}}</span>
-						<a href="#" class="add_goods" title="加入购物车"></a>
+						<a href="javascript:add_goods({{goods.id}});" class="add_goods" title="加入购物车"></a>
 					</div>
 				</li>
 				{%endfor %}
@@ -87,3 +87,20 @@
 		</div>
 	</div>
 {%endblock content%}
+{%block foot%}
+	<script type="text/javascript">
+		function add_goods(goods_id){
+			<!--判断用户是否登录-->
+			if($('.login_btn').html().indexOf('登录')>=0){
+				alert('请先登录,再购买');
+				location.href='/user/login/';
+				return;
+			}
+
+			<!--通过ajax将商品添加到购物车-->
+			$.get('/cart/add_'+goods_id+'_1/', function(data){
+				$('#show_count').html(data.num);
+			});
+		}
+	</script>
+{%endblock foot%}

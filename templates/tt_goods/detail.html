@@ -94,8 +94,6 @@
 {%block foot%}
 
 	<div class="add_jump"></div>
-
-	<script type="text/javascript" src="/static/js/jquery-1.12.2.js"></script>
 	<script type="text/javascript">
 		var $add_x = $('#add_cart').offset().top;
 		var $add_y = $('#add_cart').offset().left;
@@ -105,12 +103,26 @@
 
 		$(".add_jump").css({'left':$add_y+80,'top':$add_x+10,'display':'block'})
 		$('#add_cart').click(function(){
+
+			<!--判断用户是否登录-->
+			if($('.login_btn').html().indexOf('登录')>=0){
+				alert('请先登录,再购买');
+				location.href='/user/login/';
+				return;
+			}
+			<!--获取用户要购买的此商品的数量-->
+			goodscount = parseInt($('.num_show').val());
+			<!--通过ajax将商品添加到购物车-->
+			$.get('/cart/add_{{goods.id}}_'+goodscount+'/', function(data){
+				$('#show_count').html(data.num);
+			});
+
 			$(".add_jump").stop().animate({
 				'left': $to_y+7,
 				'top': $to_x+7},
 				"fast", function() {
 					$(".add_jump").fadeOut('fast',function(){
-						$('#show_count').html(2);
+						$('#show_count').html(data.num);
 					});
 
 			});
