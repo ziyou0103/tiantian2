@@ -32,7 +32,7 @@
 		<li class="col01"><input type="checkbox" name="" checked="" id="check_all"></li>
 		<li class="col02">全选</li>
 		<li class="col03">合计(不含运费)：<span>¥</span><em id="total">42.60</em><br>共计<b id="checked_goods">{{goods_count}}</b>件商品</li>
-		<li class="col04"><a href="place_order.html">去结算</a></li>
+		<li class="col04"><a href="#" id="go_pay">去结算</a></li>
 	</ul>
 {%endblock content%}
 {%block foot%}
@@ -54,22 +54,34 @@
 	function total(){
 		var total0 = 0; //　小计
 		var total = 0;　// 总价
-		checked_goods = 0 //　记录有被勾选商品数
+		checked_goods = 0; //　参加结算的商品数
+		url = '/order/?';// 用来拼接去结算按钮的url
+		var flag = 0;　//标记是不是第一个被勾选的购物车,拼接url时有用
+
 		$('.col07').each(function(){
+			var cart_id = $(this).parent().attr('id');
 			<!--获取商品数量-->
 			num = $(this).prev().find('.num_show').val();
 			<!--获取商品价格-->
 			price = $(this).prev().prev().html();
 			<!--小计-->
-			total0 = (parseInt(num)*parseFloat(price)).toFixed(2);
-			$(this).html(total0);
+			total0 = (parseInt(num)*parseFloat(price));
+			$(this).html(total0.toFixed(2));
 			<!--获取当前商品是否被勾选-->
 			state = $(this).parent().children('.col01').children().prop('checked');
 			if(state){// 勾选
 				checked_goods += 1;
-				total+=parseFloat(total0);
+				total+=total0;
+				if(flag==0){//　要提交订单的第一件商品
+					url = url + 'cart_id='+cart_id;
+					flag = 1;
+				}else{
+					url = url + '&cart_id='+cart_id;
+				}
+				<!--alert(url);-->
 			}
 		})
+		$('#go_pay').attr("href",url);
 		$('#checked_goods').text(checked_goods);
 		$('#total').text(total.toFixed(2));
 	}
